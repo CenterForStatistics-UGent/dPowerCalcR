@@ -250,6 +250,14 @@ dashboardBody(
     ),
     tabItem(tabName = "faq",
     	box(
+			h4("What is meant with an effect size of 0.1?"),
+			p("An effect size of 0.1 means that the power to detect a difference of 10% from a hypothesized null value (quantity) will be calculated. The value (quantity) under the null is determined by the fraction of negatives, and in addition by the partition volume for absolute quantification or the copy number for copy numbers."),
+			p("For example: if the copy number is specified as 2, the effect size as 0.1, and the aim is to detect increased copy numbers, the resulting calculated power is the power to detect a copy number of 2.2."),
+			p("Please refer to the paper and the supplementary information of the paper for more details on the power calculations."),
+			h4("Why do I need to specify the partition volume and what is the unit of the volume?"),
+			p("The power is affected by the between-replicate variance. For absolute quantification, the between-replicate variance is calculated on the level of the concentration, so that the partition volume affects this variance. This is also the reason why a partition volume needs to be specified for calculating the between-replicate variance."),
+			p("The unit is whatever you want it to be, but make sure that the value used to calculate the between-replicate variance is the same as the one used in the power calculations."),
+			p("Details on how the power and between-replicate variation is calculated are given in the supplementary information of the paper."),
 			h4("Where can I find the underlying methodology?"),
 			p("The full text of our paper is available at ..."),
 		 	h4("Questions? Feel free to contact me at Matthijs.Vynck@UGent.be.")
