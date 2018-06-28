@@ -30,27 +30,6 @@ paramsABS <- eventReactive(input$calcResultsABS,{
 	}
 )
 
-
-paramsCNV <- eventReactive(input$calcResultsCNV,{
-		list(replicates=as.numeric(input$replicatesCNV),
-			partitions=as.numeric(input$partitionsCNV),
-			interrep=as.numeric(input$interrepCNV),
-			effect=as.numeric(input$effectCNV),
-			fraction=as.numeric(input$fractionCNV),
-			significance=as.numeric(input$significanceCNV),
-			NB=as.numeric(input$NB),
-			alternative=input$AltCNV,
-			minpart=as.numeric(input$minpartCNV),
-			maxpart=as.numeric(input$maxpartCNV),
-			minrep=as.numeric(input$minrepCNV),
-			maxrep=as.numeric(input$maxrepCNV),
-			mineffect=as.numeric(input$mineffectCNV),
-			maxeffect=as.numeric(input$maxeffectCNV),
-			minrepl=as.numeric(input$minreplCNV),
-			maxrepl=as.numeric(input$maxreplCNV))
-	}
-)
-
 paramsREL <- eventReactive(input$calcResultsREL,{
 		list(replicates=as.numeric(input$replicatesREL),
 			partitions=as.numeric(input$partitionsREL),
@@ -58,7 +37,7 @@ paramsREL <- eventReactive(input$calcResultsREL,{
 			effect=as.numeric(input$effectREL),
 			fraction=as.numeric(input$fractionREL),
 			significance=as.numeric(input$significanceREL),
-			#NB=as.numeric(input$NBREL),
+			NB=as.numeric(input$NBREL),
 			alternative=input$AltREL,
 			minpart=as.numeric(input$minpartREL),
 			maxpart=as.numeric(input$maxpartREL),
@@ -85,26 +64,11 @@ output$textABS <- renderText({
 	paste0("The power for the specified parameters is: ", round(pwr*100,2), "%.")
 })
 
-
-output$textCNV <- renderText({
-	pwr <- power.ddPCR.fixed(delta=paramsCNV()[["effect"]],
-			r=paramsCNV()[["replicates"]],
-			NNeg.fr=paramsCNV()[["fraction"]],
-			NB=paramsCNV()[["NB"]],
-			alpha=paramsCNV()[["significance"]],
-			N=paramsCNV()[["partitions"]],
-			interrep=paramsCNV()[["interrep"]],
-			alternative=paramsCNV()[["alternative"]],
-			ylim=c(0,1)
-	)
-	paste0("The power for the specified parameters is: ", round(pwr*100,2), "%.")
-})
-
 output$textREL <- renderText({
 	pwr <- power.ddPCR.fixed(delta=paramsREL()[["effect"]],
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			interrep=paramsREL()[["interrep"]],
@@ -498,7 +462,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR(delta=paramsREL()[["mineffect"]],
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			Nmin=paramsREL()[["minpart"]],
 			Nmax=paramsREL()[["maxpart"]],
@@ -508,7 +472,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR(delta=1/3*(2*paramsREL()[["mineffect"]]+paramsREL()[["maxeffect"]]),
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			Nmin=paramsREL()[["minpart"]],
 			Nmax=paramsREL()[["maxpart"]],
@@ -519,7 +483,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR(delta=1/3*(paramsREL()[["mineffect"]]+2*paramsREL()[["maxeffect"]]),
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			Nmin=paramsREL()[["minpart"]],
 			Nmax=paramsREL()[["maxpart"]],
@@ -529,7 +493,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR(delta=paramsREL()[["maxeffect"]],
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			Nmin=paramsREL()[["minpart"]],
 			Nmax=paramsREL()[["maxpart"]],
@@ -545,7 +509,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR.N(delta=paramsREL()[["mineffect"]],
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			interrep=paramsREL()[["interrep"]],
@@ -554,7 +518,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR.N(delta=1/3*(2*paramsREL()[["mineffect"]]+paramsREL()[["maxeffect"]]),
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			interrep=paramsREL()[["interrep"]],
@@ -564,7 +528,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR.N(delta=1/3*(paramsREL()[["mineffect"]]+2*paramsREL()[["maxeffect"]]),
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			interrep=paramsREL()[["interrep"]],
@@ -573,7 +537,7 @@ output$plotREL <- renderPlot({
 	power.ddPCR.N(delta=paramsREL()[["maxeffect"]],
 			r=paramsREL()[["replicates"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			interrep=paramsREL()[["interrep"]],
@@ -587,7 +551,7 @@ output$plotREL <- renderPlot({
 	
 	power.ddPCR.r(delta=paramsREL()[["mineffect"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			rmin=paramsREL()[["minrep"]],
@@ -597,7 +561,7 @@ output$plotREL <- renderPlot({
 			ylim=c(0,1))
 	power.ddPCR.r(delta=1/3*(2*paramsREL()[["mineffect"]]+paramsREL()[["maxeffect"]]),
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			rmin=paramsREL()[["minrep"]],
@@ -608,7 +572,7 @@ output$plotREL <- renderPlot({
 			add=T,lty=2)
 	power.ddPCR.r(delta=1/3*(paramsREL()[["mineffect"]]+2*paramsREL()[["maxeffect"]]),
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			rmin=paramsREL()[["minrep"]],
@@ -618,7 +582,7 @@ output$plotREL <- renderPlot({
 			add=T,lty=3)
 	power.ddPCR.r(delta=paramsREL()[["maxeffect"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			rmin=paramsREL()[["minrep"]],
@@ -634,7 +598,7 @@ output$plotREL <- renderPlot({
 
 	power.ddPCR.VB(delta=paramsREL()[["effect"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			r=paramsREL()[["minrep"]],
@@ -644,7 +608,7 @@ output$plotREL <- renderPlot({
 			ylim=c(0,1))
 	power.ddPCR.VB(delta=paramsREL()[["effect"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			r=floor(1/3*(2*paramsREL()[["minrep"]]+paramsREL()[["maxrep"]])),
@@ -655,7 +619,7 @@ output$plotREL <- renderPlot({
 			add=T,lty=2)
 	power.ddPCR.VB(delta=paramsREL()[["effect"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			r=ceiling(1/3*(paramsREL()[["minrep"]]+2*paramsREL()[["maxrep"]])),
@@ -665,7 +629,7 @@ output$plotREL <- renderPlot({
 			add=T,lty=3)
 	power.ddPCR.VB(delta=paramsREL()[["effect"]],
 			NNeg.fr=paramsREL()[["fraction"]],
-			NB=1,
+			NB=paramsREL()[["NB"]],
 			alpha=paramsREL()[["significance"]],
 			N=paramsREL()[["partitions"]],
 			r=paramsREL()[["maxrep"]],
@@ -862,13 +826,13 @@ output$hotREL <- renderRHandsontable({
 
 
 interrepvarREL <- eventReactive(input$calcInterrepREL,{
-		list(data = valuesREL$data)
+		list(data = valuesREL$data,NB=as.numeric(input$interrepNB))
 	}
 )
 
 output$interrepREL <- renderText({
 	data.interrep <- as.data.frame(interrepvarREL()[["data"]])
-	betweenrep <- varBetweenCNV(data.interrep)
+	betweenrep <- varBetweenCNV(data.interrep, interrepvarREL()[["NB"]])
 	if(betweenrep<0){
 		paste0("There is no evidence for between-replicate variation.")
 	} else {

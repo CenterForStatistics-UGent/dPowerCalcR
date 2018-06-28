@@ -18,12 +18,10 @@ ui<-shinyUI(dashboardPage(
 	sidebarMenu(
     	menuItem("Power calculation", tabName = "power", icon = icon("calculator"),
     		menuSubItem("Absolute quantification", tabName = "abs"),
-   	 		menuSubItem("Relative quantification", tabName = "rel"),
-   	 		menuSubItem("Copy number", tabName = "cnv")),
+   	 		menuSubItem("Relative quantification", tabName = "rel")),
    	 	menuItem("Between-replicate variation", tabName = "interrep", icon = icon("bullseye"),	
     		menuSubItem("Absolute quantification", tabName = "interrepABS"),
-   	 		menuSubItem("Relative quantification", tabName = "interrepREL"),
-   	 		menuSubItem("Copy number", tabName = "interrepCNV")),   	 	
+   	 		menuSubItem("Relative quantification", tabName = "interrepREL")),   	 	
        	menuItem("Help", tabName = "help", icon = icon("question-circle"),
     		menuSubItem("Citation", tabName = "cite"),
    	 		menuSubItem("FAQ", tabName = "faq"))
@@ -104,7 +102,7 @@ dashboardBody(
 				textInput("effectREL","Effect size",value="0.1"),
 				sliderInput("fractionREL", "Fraction of negatives for target", 0, 1, 0.2),
 				sliderInput("significanceREL", "Significance level", 0, 0.1, 0.05),
-				#textInput("NBREL","Expected relative quantity",value="1"),
+				textInput("NBREL","Expected relative quantity",value="1"),
 				selectInput("AltREL","Hypothesis",choices=c("Two-sided","Less","Greater")),
 				HTML("<br>"),
 				actionButton("calcResultsREL", "Calculate")				
@@ -138,58 +136,7 @@ dashboardBody(
       )
 	),
 
-	
-	################################
-	# COPY NUMBER 
-	################################
-	tabItem(tabName = "cnv",
-    	h2("Power calculation for copy number variation"),
-		fluidRow(
-			box(
-				#HTML("<hr>"),
-				title="Power parameters",
-				width=6,
-				height=770,
-				textInput("partitionsCNV","Number of partitions",value="15000"),
-				textInput("replicatesCNV","Number of replicates",value="3"),
-				textInput("interrepCNV","Between-replicate variation",value="0.001"),
-				textInput("effectCNV","Effect size",value="0.1"),
-				sliderInput("fractionCNV", "Fraction of negatives for target", 0, 1, 0.2),
-				sliderInput("significanceCNV", "Significance level", 0, 0.1, 0.05),
-				textInput("NB","Expected number of copies",value="2"),
-				selectInput("AltCNV","Hypothesis",choices=c("Two-sided","Less","Greater")),
-				HTML("<br>"),
-				actionButton("calcResultsCNV", "Calculate")				
-			),
-			box(
-				title="Plot parameters",
-				width=6,
-				height=770,
-				textInput("minpartCNV","Minimum number of partitions",value="1000"),
-				textInput("maxpartCNV","Maximum number of partitions",value="20000"),
-				textInput("minrepCNV","Minimum number of replicates",value="2"),
-				textInput("maxrepCNV","Maximum number of replicates",value="10"),
-				textInput("mineffectCNV", "Minimal effect size", value="0.05"),
-				textInput("maxeffectCNV", "Maximal effect size", value="0.2"),
-				textInput("minreplCNV", "Minimal between-replicate variation", value="0"),
-				textInput("maxreplCNV", "Maximal between-replicate variation", value="0.01")
-			)
-	   ),
-	   fluidRow(
-			box(
-				title="Results",width=12,
-				textOutput("textCNV"),
-				plotOutput("plotCNV",height="1000px")
-			)
-		),
-	   fluidRow(
-			box(title="Generate report",width=12,
-	        	textInput("reportTitle","Title of the report",value="Digital PCR experiment design report"),
-	        	downloadButton("reportGenerateCNV","Generate report")
-    	)      
-      )
-	),	
-	
+
 	
 	tabItem(tabName = "interrepABS",
 		h2("Calculate between-replicate variation for absolute quantities"),
@@ -206,28 +153,14 @@ dashboardBody(
 				textOutput("interrepABS")
 			))      	
     ),	
-	
-	tabItem(tabName = "interrepCNV",
-		h2("Calculate between-replicate variation for copy numbers"),
-    	fluidRow(
-    		box(
-		 		sliderInput("nsampleCNV", "Number of samples", 2, 100, 5),
-		 		textInput("interrepNB","Expected number of copies", "2"),
-				rHandsontableOutput("hotCNV"),
-				HTML("<br>"),
-				actionButton("calcInterrepCNV", "Calculate")		 	      
-      	)),
-	   fluidRow(
-			box(
-				textOutput("interrepCNV")
-			))      	
-    ),		
+		
 
 	tabItem(tabName = "interrepREL",
 		h2("Calculate between-replicate variation for relative quantities"),
     	fluidRow(
     		box(
 		 		sliderInput("nsampleREL", "Number of samples", 2, 100, 5),
+		 		textInput("interrepNB","Expected relative quantity", "1"),		 		
 				rHandsontableOutput("hotREL"),
 				HTML("<br>"),
 				actionButton("calcInterrepREL", "Calculate")		 	      
@@ -243,7 +176,7 @@ dashboardBody(
 
 		 	h4("Citation"),
 		 	p("When using this application to design your dPCR experiments, please cite:"),
-		 	p("Vynck, M. et al. (2018). On the design of digital PCR experiments."),
+		 	p("Vynck, M. et al. (2018). On determinig the power of digital PCR experiments."),
 		 	p("Full text available at ..."),
 		 	p("More information on digital PCR data analysis on http://dpcr.ugent.be.")		 	      
       	)
@@ -251,12 +184,12 @@ dashboardBody(
     tabItem(tabName = "faq",
     	box(
 			h4("What is meant with an effect size of 0.1?"),
-			p("An effect size of 0.1 means that the power to detect a difference of 10% from a hypothesized null value (quantity) will be calculated. The value (quantity) under the null is determined by the fraction of negatives, and in addition by the partition volume for absolute quantification or the copy number for copy numbers."),
-			p("For example: if the copy number is specified as 2, the effect size as 0.1, and the aim is to detect increased copy numbers, the resulting calculated power is the power to detect a copy number of 2.2."),
+			p("An effect size of 0.1 means that the power to detect a difference of 10% from a hypothesized null value (quantity) will be calculated. The value (quantity) under the null is determined by the fraction of negatives and by the partition volume for absolute quantification, or the expected relative quantity for relative quantities."),
+			p("For example: if the relative quantity is specified as 2 and the effect size as 0.2, the resulting calculated power is the power to detect a relative quantity of 2.4."),
 			p("Please refer to the paper and the supplementary information of the paper for more details on the power calculations."),
 			h4("Why do I need to specify the partition volume and what is the unit of the volume?"),
 			p("The power is affected by the between-replicate variance. For absolute quantification, the between-replicate variance is calculated on the level of the concentration, so that the partition volume affects this variance. This is also the reason why a partition volume needs to be specified for calculating the between-replicate variance."),
-			p("The unit is whatever you want it to be, but make sure that the value used to calculate the between-replicate variance is the same as the one used in the power calculations."),
+			p("The unit is whatever you want it to be, but make sure that the value used to calculate the between-replicate variance is the same as the one used in the power calculations. With constant partition volumes, you may safely leave the partition volume parameter at the default level. The power calculations will not be affected."),
 			p("Details on how the power and between-replicate variation is calculated are given in the supplementary information of the paper."),
 			h4("Where can I find the underlying methodology?"),
 			p("The full text of our paper is available at ..."),

@@ -6,20 +6,23 @@
 # variance of CNV based on first order taylor expansion. This is the variance that I derived using a first order Taylor expansion for Var(X/Y) with X and Y independently distributed. This is equivalent to the CI-based formulation of the approximation used by Bio-Rad
 
 varCNV2<-function(N,NNegA,delta,r,VarBetween,NB) {
+	# This function calculates the variance of the CNV estimate based on r replicates
 	#
-	# delta: effect under H1
-	# NNegA.fr: fraction of negatives
+	# based on estimate of between replicate variance
+	# based on first order Taylor expansion
+	# delta: CNV under H1
+	# N: total number of droplets
+	# NNegA: number of negatives for the target
 	# r: number of replicates
-	# Vp: partition volume	 
-	# alpha: significance level (one-sided)
-	# add=F: add=T --> line added to existing graph
-	# lty=1: line type to be used for plotting
+	# VarBetween: variance of r replicates calculated from Jo's Excel file
+	# NB: relative quantity under the null hypothesis	 
+	# we assume the covariance between the estimators of pA and pB is zero
 	#
 	pA<-NNegA/N
-	pB<-pA^(1/delta)
+	pB<-pA^(NB/delta)
 	VarPA<-pA*(1-pA)/N
-	VarPB<-pA^(1/delta)*(1-pA^(1/delta))/N
-	vPoisson<-(NB*delta/(pA*log(pA)))^2*VarPA+(NB*delta^2/(log(pA)*pB))^2*VarPB
+	VarPB<-pA^(NB/delta)*(1-pA^(NB/delta))/N
+	vPoisson<-(delta/(NB*pA*log(pA)))^2*VarPA+(delta^2/(NB^2*log(pA)*pB))^2*VarPB
 	v<-(vPoisson+VarBetween)/r
 	return(v)
 }
@@ -40,17 +43,19 @@ calcPoisVar <- function(data.subset,ref.subset){
 	VarPB<-pB*(1-pB)/mean(ref.subset[,2], na.rm = TRUE)
 	delta <- log(pA)/log(pB)
 	NB <- 1
-	poisVar<-(NB*delta/(pA*log(pA)))^2*VarPA+(NB*delta^2/(log(pA)*pB))^2*VarPB
+	poisVar<-(delta/(NB*pA*log(pA)))^2*VarPA+(delta^2/(NB^2*log(pA)*pB))^2*VarPB
 	return(poisVar)
 }
 
 
 power.ddPCR.fixed<-function(delta=1,r=3,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),N=20000,interrep=0.0031,add=F,lty=1,alternative="Two-sided") {
+	# This function computes and plots the power for testing H0: CNV=1 against H1: CNV=delta
+	# as a function of the total number of droplets
 	#
-	# delta: effect under H1
-	# NNegA.fr: fraction of negatives
+	# delta: CNV under H1
+	# NNegA.fr: fraction of negatives for the reference (fraction of total number of droplets)
 	# r: number of replicates
-	# Vp: partition volume	 
+	# NB: relative quantity under the null hypothesis	 
 	# alpha: significance level (one-sided)
 	# add=F: add=T --> line added to existing graph
 	# lty=1: line type to be used for plotting
@@ -70,11 +75,13 @@ power.ddPCR.fixed<-function(delta=1,r=3,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1
 }
 
 power.ddPCR<-function(delta=1,r=3,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),Nmin=5000,Nmax=20000,interrep=0.0031,add=F,lty=1,alternative="Two-sided") {
+	# This function computes and plots the power for testing H0: CNV=1 against H1: CNV=delta
+	# as a function of the total number of droplets
 	#
-	# delta: effect under H1
-	# NNegA.fr: fraction of negatives
+	# delta: CNV under H1
+	# NNegA.fr: fraction of negatives for the reference (fraction of total number of droplets)
 	# r: number of replicates
-	# Vp: partition volume	 
+	# NB: relative quantity under the null hypothesis	 	 
 	# alpha: significance level (one-sided)
 	# add=F: add=T --> line added to existing graph
 	# lty=1: line type to be used for plotting
@@ -101,11 +108,13 @@ power.ddPCR<-function(delta=1,r=3,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),Nmin
 
 
 power.ddPCR.N<-function(delta=1,r=3,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),N=15000,interrep=0.0031,add=F,lty=1,alternative="Two-sided") {
+	# This function computes and plots the power for testing H0: CNV=1 against H1: CNV=delta
+	# as a function of the fraction of negatives
 	#
-	# delta: effect under H1
-	# NNegA.fr: fraction of negatives
+	# delta: CNV under H1
+	# NNegA.fr: fraction of negatives for the reference (fraction of total number of droplets)
 	# r: number of replicates
-	# Vp: partition volume	 
+	# NB: relative quantity under the null hypothesis	 	 
 	# alpha: significance level (one-sided)
 	# add=F: add=T --> line added to existing graph
 	# lty=1: line type to be used for plotting
@@ -132,43 +141,15 @@ power.ddPCR.N<-function(delta=1,r=3,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),N=
 }
 
 
-power.ddPCR.N.max<-function(delta.low=1.01,delta.high=1.50,step=0.01,r=3,N=14000,NB=2,alpha=0.05,ylim=c(0,1),add=F,lty=1,alternative="two.sided") {
-	#
-	# delta: effect under H1
-	# NNegA.fr: fraction of negatives
-	# r: number of replicates
-	# Vp: partition volume	 
-	# alpha: significance level (one-sided)
-	# add=F: add=T --> line added to existing graph
-	# lty=1: line type to be used for plotting
-	#
-	CN.delta <- NB*delta 
-	NNeg.fr<-seq(0.01,0.99,by=0.001)
-	delta<-seq(delta.low,delta.high,step)
-	optimal.frac<-array(0,length(delta))
-	pwr<-array(0,length(delta))
-	for(i in 1:length(delta)){
-		sd.CNV<-sapply(NNeg.fr,function(NNegA.fr,n,delta,NB) {
-			sqrt(varCNV2(n,NNegA=n*NNegA.fr,delta=delta,r=r,VarBetween=0.0031,NB=NB))}, n=N,delta=delta[i],NB=NB)
-		pwr.temp<-(1-pnorm(qnorm(1-alpha)-(delta[i]-1)/sd.CNV))
-		pwr[i]<-max(pwr.temp) # 
-		optimal.frac[i]<-which(pwr.temp==max(pwr.temp))/length(pwr.temp)
-	}
-	par(mfrow=c(1,2))
-	plot(delta,pwr,xlab="CNV",ylab="Maximum power achievable",type="l",main="",ylim=ylim,lty=lty)
-	plot(delta,optimal.frac,xlab="CNV",ylab="Optimal negative fraction",type="l",main="",ylim=c(0.3,0.35),lty=lty)
-	par(mfrow=c(1,1))
-}
-
 power.ddPCR.r<-function(delta=1,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),N=15000,rmin=2,rmax=10,interrep=0.0031,add=F,lty=1,alternative="Two-sided") {
+	# This function computes and plots the power for testing H0: CNV=1 against H1: CNV=delta for varying number of replicates
 	#
-	# delta: effect under H1
-	# NNegA.fr: fraction of negatives
+	# delta: CNV under H1
+	# NNegA.fr: fraction of negatives for the reference (fraction of total number of droplets)
 	# r: number of replicates
-	# Vp: partition volume	 
+	# NB: relative quantity under the null hypothesis	 	 
 	# alpha: significance level (one-sided)
 	# add=F: add=T --> line added to existing graph
-	# lty=1: line type to be used for plotting
 	#
 	delta <- delta+1
 	CN.delta <- NB*delta 
@@ -192,14 +173,14 @@ power.ddPCR.r<-function(delta=1,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),N=1500
 
 
 power.ddPCR.VB<-function(delta=1,NNeg.fr=0.2,NB=2,alpha=0.05,ylim=c(0.5,1),N=15000,r=3,interrepmin=0,interrepmax=0.01,add=F,lty=1,alternative="Two-sided") {
+	# This function computes and plots the power for testing H0: CNV=1 against H1: CNV=delta for varying number of replicates
 	#
-	# delta: effect under H1
-	# NNegA.fr: fraction of negatives
+	# delta: CNV under H1
+	# NNegA.fr: fraction of negatives for the reference (fraction of total number of droplets)
 	# r: number of replicates
-	# Vp: partition volume	 
+	# NB: relative quantity under the null hypothesis	 	 
 	# alpha: significance level (one-sided)
 	# add=F: add=T --> line added to existing graph
-	# lty=1: line type to be used for plotting
 	#
 	delta=delta+1
 	CN.delta <- NB*delta 
